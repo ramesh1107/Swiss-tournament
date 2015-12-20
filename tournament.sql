@@ -26,20 +26,21 @@
 -- match (match id ) 
 -- bye ( score for bye)
 
-	create table "plyr" (
+	create table  "tournament"
+        (tid SERIAL primary key,
+        trnname TEXT Not Null);
+
+    create table "plyr" (
         pid   serial ,
         pname TEXT Not Null,
-        tid int,
-        score       Int Not Null ,
-        matches      INT  Not Null,
-        bye      int Not Null);
-
-    create table  "tournament"
-        (tid SERIAL ,
-        trnname TEXT Not Null);
+        tid int references tournament(tid) ON DELETE CASCADE,
+        score       Int Not Null DEFAULT 0,
+        matches      INT  Not Null DEFAULT 0,
+        bye      int Not Null DEFAULT 0);
+ 
     
     create table  "match"
-        (tid      INT  Not Null ,
+        (tid      INT  Not Null references tournament(tid) ON DELETE CASCADE ,
         Winner       Int  Not Null,
         loser      INT    Not Null,
         draw      boolean Not Null);

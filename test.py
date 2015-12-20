@@ -138,8 +138,6 @@ def testPairings():
 if __name__ == '__main__':
   testdroptbales()
   testcreatetable()
-  #  testDeleteMatches()
-  #  testDelete()
   testCount()
   testRegister()
   testRegisterCountDelete()
