@@ -29,7 +29,7 @@ Instructions to run test.py
  
 1)Please open a virtual machine (you can use vagrant and oracle virutal machine for VM)and access the shell of virtual machine (any bash editor)
 2)Navigate to the folder where all the file test.py and tournament.py are stored
-3)There is no need to use python.sql, it is included in the package more for completeness of package.
+3)There is no need to use tournament.sql, it is included in the package more for completeness of package.
 4)Please note test.py will call procedures to drop and create tables from with in python code. The drop tables will only work if tables exist.
 5)Execute test.py , this has all test data built in to check all fucntions of the tournament code.
 6)After testing all the procedures it will display a message - "testpairings- Tested successfully Success!  All tests pass!"
