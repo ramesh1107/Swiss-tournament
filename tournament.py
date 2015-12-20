@@ -21,10 +21,22 @@ This program has options to give byes in case we have odd number of players
 import psycopg2
 
 
-def connect():
-    """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournament")
-    print "db connected"
+
+    
+
+"""Connect to the PostgreSQL database.  Returns a database connection."""
+ #def connect():
+ #   return psycopg2.connect("dbname=tournament")
+    
+def connect(database_name="tournament"):
+    try:
+        DB = psycopg2.connect("dbname={}".format(database_name))
+        c = DB.cursor()
+        print "db connected"
+        return DB, c
+    except:
+        print("unable to connect to database")
+
 
 """This procedure is to create the requred tables
 This code is used to create tables called
@@ -52,22 +64,24 @@ The match table has 5 columns which are
 
 
 def createtable():
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
+   # c = DB.cursor()
+    c.execute("create table  tournament\
+        (tid SERIAL primary key ,\
+        trnname TEXT Not Null );")
+
     c.execute("create table plyr (\
         pid   serial ,\
         pname TEXT Not Null,\
-        tid int,\
-        score       Int Not Null ,\
-        matches      INT  Not Null,\
-        bye      int Not Null);")
-    c.execute("create table  tournament\
-        (tid SERIAL ,\
-        trnname TEXT Not Null );")
+        tid int references tournament(tid) ON DELETE CASCADE,\
+        score       Int Not Null DEFAULT 0,\
+        matches      INT  Not Null DEFAULT 0,\
+        bye      int Not Null DEFAULT 0);")
+    
     c.execute("create table  match\
-        (tid      INT  Not Null ,\
-        Winner       Int  Not Null,\
-        loser      INT    Not Null,\
+        (tid      INT  Not Null references tournament(tid) ON DELETE CASCADE ,\
+        Winner     Int  Not Null ,\
+        loser      INT    ,\
         draw      boolean Not Null);")
     DB.commit()
     DB.close()
@@ -78,10 +92,10 @@ This procedure is used to drop tables when not required
 
 
 def droptable():
-    DB = connect()
-    c = DB.cursor()
-    c.execute("Drop TABLE  plyr")
-    c.execute("Drop TABLE  tournament")
+    DB, c = connect()
+   
+    c.execute("Drop TABLE  tournament cascade" )
+    c.execute("Drop TABLE  plyr")    
     c.execute("Drop TABLE match")
     DB.commit()
     DB.close()
@@ -90,24 +104,24 @@ def droptable():
 
 
 def deleteMatches():
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
+   # c = DB.cursor()
     c.execute("DELETE from match;")
     DB.commit()
     DB.close()
 
 
 def deletePlayers():
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
+ #   c = DB.cursor()
     c.execute("DELETE from plyr;")
     DB.commit()
     DB.close()
 
 
 def deletetournament():
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
+ #   c = DB.cursor()
     c.execute("DELETE from tournament;")
     DB.commit()
     DB.close()
@@ -117,10 +131,11 @@ def deletetournament():
 
 
 def countplyr(tid):
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
+  #  c = DB.cursor()
     c.execute("Select count(pid) from plyr")
     post = (c.fetchone())
+    print "count of players", post
     return post[0]
 
 """Adds a player to the tournament database.
@@ -135,8 +150,8 @@ def createTournament(trname):
     """Create a new tournament.
     Args: Name of tournament
     """
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
+   # c = DB.cursor()
     sql = "INSERT INTO tournament (trnname) VALUES (%s) RETURNING tid"
     c.execute(sql, (trname,))
     tid = c.fetchone()[0]
@@ -154,8 +169,8 @@ def createTournament(trname):
 
 
 def registerPlyr(tid, pname):
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
+   # c = DB.cursor()
     print "inserting into plyr tournament id", tid
     plyr = "INSERT INTO plyr (pname,tid,score,matches,bye )\
             VALUES (%s,%s,0,0,0) RETURNING pid"
@@ -184,8 +199,8 @@ def registerPlyr(tid, pname):
 
 def plyrStandings(tid):
 
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
+   # c = DB.cursor()
     c.execute("SELECT pid, pname ,score,matches\
                 FROM plyr\
                 WHERE tid = tid \
@@ -214,8 +229,8 @@ def reportMatch(tid, winner, loser, draw):
         w_points = 3
         l_points = 0
 
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
+    #c = DB.cursor()
     ins = "INSERT INTO match (tid, winner, loser, draw) \
             VALUES (%s,%s,%s,%s)"
     win = "UPDATE plyr SET score = score+%s, matches = matches+1\
@@ -237,8 +252,8 @@ def reportMatch(tid, winner, loser, draw):
 
 
 def hasBye(pid, tid):
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
+  #  c = DB.cursor()
     sql = """SELECT bye
              FROM plyr
              WHERE pid = %s
@@ -259,8 +274,8 @@ def hasBye(pid, tid):
 
 
 def reportBye(pid, tid):
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
+  #  c = DB.cursor()
     bye = "UPDATE plyr SET score = score+3, bye=bye+1 \
            WHERE pid = %s AND tid = %s"
     c.execute(bye, (pid, tid))
@@ -316,8 +331,8 @@ def checkPairs(tid, ranks, id1, id2):
 
 
 def validPair(p1, p2, tid):
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
+ #   c = DB.cursor()
     sql = """SELECT winner, loser
              FROM match
              WHERE ((winner = %s AND loser = %s)

@@ -2,9 +2,7 @@
 --
 -- This code is used to create a database called tournament master which  
 -- will hold all the required tables
-
 --CREATE DATABASE Tournament;
-
 -- This code is used to create  tables called plyr, tournament, match 
 -- and scorecard
 -- The player table has 2 columns which are
@@ -27,34 +25,30 @@
 -- score  (score for match)
 -- match (match id ) 
 -- bye ( score for bye)
- 
 
+	create table "plyr" (
+        pid   serial ,
+        pname TEXT Not Null,
+        tid int,
+        score       Int Not Null ,
+        matches      INT  Not Null,
+        bye      int Not Null);
+
+    create table  "tournament"
+        (tid SERIAL ,
+        trnname TEXT Not Null);
+    
+    create table  "match"
+        (tid      INT  Not Null ,
+        Winner       Int  Not Null,
+        loser      INT    Not Null,
+        draw      boolean Not Null);
 
 
 -- This code is used to Drop tables created two tables called player and match. 
 
---create table plyr (
---      ID SERIAL ,
---      NAME TEXT Not Null)
---create table  tournament(
---      ID SERIAL ,
- --     NAME TEXT Not Null)
---  create table  match(
---      match_ID  SERIAL  ,
---      tournament      INT  Not Null ,
---     Winner       Int  Not Null,
---      loser      INT    Not Null,
---      draw      boolean Not Null)
---  create table  scorecard(
---      tournament      INT  Not Null ,
---      plyr       Int  Not Null,
---      score       Int Not Null ,
---      matches      INT  Not Null,
---      bye      int Not Null)
-     
-
---  Drop TABLE  plyr
---  Drop TABLE  tournament
---  Drop TABLE match 
---  Drop TABLE  scorecard 
+ 	--Drop TABLE "plyr";
+ 	--Drop TABLE "tournament";
+ 	--Drop TABLE "match" ;
+ 
     
