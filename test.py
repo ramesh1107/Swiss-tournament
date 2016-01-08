@@ -15,9 +15,9 @@ def testdroptbales():
 
 
 def testCount():
-    #deleteMatches()
-    #deletePlayers()
-    #deletetournament()
+    deleteMatches()
+    deletePlayers()
+    deletetournament()
     tid=createTournament("India Open")
     print "india open created"
     cnt = countplyr(tid)
@@ -72,18 +72,23 @@ def testStandingsBeforeMatches():
     tid=createTournament("AUS Open")
     registerPlyr(tid,"Melpomene Murray")
     registerPlyr(tid,"Randy Schwartz")
+
     standings = plyrStandings(tid)
+    print "standings" ,len(standings)
     if len(standings) < 2:
+        
         raise ValueError("Players should appear in playerStandings even before "
                          "they have played any matches.")
     elif len(standings) > 2:
         raise ValueError("Only registered players should appear in standings.")
-    if len(standings[0]) != 4:
-        raise ValueError("Each playerStandings row should have four columns.")
-    [(id1, name1, score1,matches1), (id2,name2, score2,matches2)] = standings
-    if matches1 != 0 or matches2 != 0 or score1 != 0 or score2 != 0:
+    b=len(standings[0])
+    
+    if len(standings[0]) != 5:
+        raise ValueError("Each playerStandings row should have five columns.")
+    [(id1, name1,Win1,lsr1,cntr1), (id2,name2,Win2,lsr2,cntr2)] = standings
+    if Win1 != 0 or Win2 != 0 or lsr1 != 0 or lsr2 != 0 or cntr1 != 0 or cntr2 != 0:
         raise ValueError(
-            "Newly registered players should have no matches or wins.")
+            "Newly registered players should have no matches or wins or byes.")
     print "6. Newly registered players appear in the standings with no matches."
      
 def testReportMatches():
@@ -101,12 +106,18 @@ def testReportMatches():
     reportMatch(tid,id1, id2,"false")
     reportMatch(tid,id3, id4,"false")
     standings = plyrStandings(tid)
-    for (i, n, s, m) in standings:
-        if m != 1:
+    for (i, n, w, l,c) in standings:
+        print "player id",i
+        print "player name",n
+        print "winner id",w
+        print "loser id",l
+        print "count",c
+        print "checking the fucking condition"
+        if n is None:
             raise ValueError("Each player should have one match recorded.")
-        if i in (id1, id3) and s != 3:
+        if i in (id1, id3) and w != 1:
             raise ValueError("Each match winner should have one win recorded.")
-        elif i in (id2, id4) and s != 0:
+        elif i in (id2, id4) and l != 0:
             raise ValueError("Each match loser should have zero wins recorded.")
     print "7. After a match, players have updated standings."
 
@@ -136,8 +147,8 @@ def testPairings():
     print "testpairings- Tested successfully"
  
 if __name__ == '__main__':
-  testdroptbales()
-  testcreatetable()
+ # testdroptbales()
+ # testcreatetable()
   testCount()
   testRegister()
   testRegisterCountDelete()
